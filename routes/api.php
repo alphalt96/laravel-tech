@@ -19,4 +19,5 @@ Route::post('/login', 'Api\\UserController@login');
 Route::get('test', 'TestController@test');
 Route::prefix('user')->middleware(['auth:api'])->group(function() {
     Route::get('/{id?}', 'Api\\UserController@getUserDetail');
+    Route::put('/', 'Api\\UserController@putUserDetail');
 });

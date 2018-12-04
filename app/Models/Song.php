@@ -27,6 +27,6 @@ class Song extends Model
     }
 
     public function image() {
-        return $this->morphMany(Image::class, 'target', 'target_type', 'id_target_ref');
+        return $this->morphOne(Image::class, 'target', 'target_type', 'id_target_ref');
     }
 }
