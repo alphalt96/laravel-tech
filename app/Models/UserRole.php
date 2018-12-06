@@ -8,6 +8,8 @@ class UserRole extends Model
 {
     protected $table = 'user_role';
 
+    protected $primaryKey = 'id_user_role';
+
     public function Users() {
         return $this->hasMany('App\Models\User');
     }

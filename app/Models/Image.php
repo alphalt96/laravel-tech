@@ -8,7 +8,9 @@ class Image extends Model
 {
     protected $table = "image";
 
+    protected $primaryKey = "id_image";
+
     public function tableTarget() {
-        return $this->morphTo();
+        return $this->morphTo('target');
     }
 }
