@@ -5,15 +5,24 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
+use App\Repositories\UserRepository;
 use Carbon\Carbon;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use phpseclib\Crypt\Hash;
+use App\Repositories\UserRepositoryInterface;
 
 class UserController extends Controller
 {
+
+    protected $userModel;
+
+    public function __construct(User $userModel)
+    {
+        $this->userModel = new UserRepository($userModel);
+    }
 
     /**
      * Register user and return a token
@@ -23,12 +32,18 @@ class UserController extends Controller
      */
     public function register(UserRegisterRequest $request) {
         try {
-            $newUser = User::firstOrCreate([
-                'username' => $request->username,
-                'password' => bcrypt($request->password),
-                'email' => $request->email,
-                'id_user_role' => '3',
-            ]);
+//            $newUser = User::firstOrCreate([
+//                'username' => $request->username,
+//                'password' => bcrypt($request->password),
+//                'email' => $request->email,
+//                'id_user_role' => '3',
+//            ]);
+            $newUser = new User();
+            $newUser->username = $request->username;
+            $newUser->password = bcrypt($request->password);
+            $newUser->email = $request->email;
+            $newUser->id_user_role = 3;
+            $newUser->save();
             $token = $newUser->createToken('normal_user');
             return response()->json([
                 'token' => $token->accessToken
@@ -78,10 +93,10 @@ class UserController extends Controller
                 $id = Auth::id();
             }
             $user = new User($id);
-            $data = $user->findUser([
-                'id_user', 'username', 'nickname', 'email', 'avatar_link'
-            ]);
-            dd($data->username);
+//            $data = $user->findUser([
+//                'id_user', 'username', 'nickname', 'email', 'avatar_link'
+//            ]);
+            dd($this->userModel->getUserDetail($id));
         } catch (\Exception $e) {
 
         }
