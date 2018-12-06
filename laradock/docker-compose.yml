@@ -31,7 +31,6 @@ services:
         - "${WORKSPACE_SSH_PORT}:22"
       tty: true
       environment:
-        - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
         - DOCKER_HOST=tcp://docker-in-docker:2375
       networks:
         - backend
@@ -46,7 +45,6 @@ services:
         args:
           - LARADOCK_PHP_VERSION=${PHP_VERSION}
           - LARADOCK_PHALCON_VERSION=${PHALCON_VERSION}
-          - INSTALL_MEMCACHED=${PHP_FPM_INSTALL_MEMCACHED}
           - INSTALL_MYSQLI=${PHP_FPM_INSTALL_MYSQLI}
       volumes:
         - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
@@ -58,7 +56,6 @@ services:
       environment:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
         - DOCKER_HOST=tcp://docker-in-docker:2375
-        - FAKETIME=${PHP_FPM_FAKETIME}
       depends_on:
         - workspace
       networks:
@@ -89,23 +86,42 @@ services:
         - backend
 
   ### MySQL ################################################
+#    mysql:
+#      container_name: laravel-tech-database
+#      build:
+#        context: ./mysql
+#        args:
+#          - MYSQL_VERSION=${MYSQL_VERSION}
+##      environment:
+##        - MYSQL_DATABASE=${MYSQL_DATABASE}
+##        - MYSQL_USER=${MYSQL_USER}
+##        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+##        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#      environment:
+#        - "MYSQL_DATABASE=goodgame"
+#        - "MYSQL_USER=admin"
+#        - "MYSQL_PASSWORD=admin"
+#        - "MYSQL_ROOT_PASSWORD=admin"
+#      volumes:
+#        - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
+#        - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+#      ports:
+#        - "${MYSQL_PORT}:3306"
+#      networks:
+#        - backend
+
     mysql:
       container_name: laravel-tech-database
-      build:
-        context: ./mysql
-        args:
-          - MYSQL_VERSION=${MYSQL_VERSION}
-      environment:
-        - MYSQL_DATABASE=${MYSQL_DATABASE}
-        - MYSQL_USER=${MYSQL_USER}
-        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        - TZ=${WORKSPACE_TIMEZONE}
+      image: mysql:5.6
       volumes:
-        - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
-        - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+        - ./dbdata:/var/lib/mysql
+      environment:
+        - "MYSQL_DATABASE=goodgame"
+        - "MYSQL_USER=admin"
+        - "MYSQL_PASSWORD=admin"
+        - "MYSQL_ROOT_PASSWORD=admin"
       ports:
-        - "${MYSQL_PORT}:3306"
+        - "3306:3306"
       networks:
         - backend
 
