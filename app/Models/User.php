@@ -18,16 +18,6 @@ class User extends Authenticatable
 
     protected $idUser;
 
-    protected $appends = ['avatar_link'];
-
-    public function __construct($id = null)
-    {
-        parent::__construct();
-        if (!is_null($id)) {
-            $this->idUser = $id;
-        }
-    }
-
     /**
      * The attributes that are mass assignable.
      *
@@ -36,6 +26,8 @@ class User extends Authenticatable
     protected $fillable = [
         'username', 'email', 'password', 'id_user_role',
     ];
+
+    protected $hidden = ['password'];
 
     public function UserRole() {
         return $this->belongsTo('App\Model\UserRole', 'id_user_role', 'id_user_role');
@@ -56,19 +48,6 @@ class User extends Authenticatable
     public function songDownloads() {
         return $this->hasMany('App\Models\SongDownload');
     }
-
-    public function findUser($column) {
-        try {
-            return self::select($column)->find($this->idUser);
-        } catch (\Exception $e) {
-            return $e;
-        }
-    }
-
-//    public function getUsernameAttribute()
-//    {
-//        dd("cc");
-//    }
 
     public function image() {
         return $this->morphMany(Image::class, 'target', 'target_type', 'id_target_ref');
