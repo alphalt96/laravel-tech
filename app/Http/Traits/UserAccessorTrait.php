@@ -11,8 +11,5 @@ namespace App\Http\Traits;
 
 trait UserAccessorTrait
 {
-    public function getAvatarLinkAttribute($value) {
-        dd('cc');
-       return request()->getHost() + config("path.public.avatar") + $value;
-    }
+    //
 }

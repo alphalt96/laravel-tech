@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
+use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\UserRepository;
 use Carbon\Carbon;
 use http\Env\Response;
@@ -12,16 +13,15 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use phpseclib\Crypt\Hash;
-use App\Repositories\UserRepositoryInterface;
 
 class UserController extends Controller
 {
 
     protected $userModel;
 
-    public function __construct(User $userModel)
+    public function __construct(UserRepositoryInterface $userModel)
     {
-        $this->userModel = new UserRepository($userModel);
+        $this->userModel = $userModel;
     }
 
     /**
@@ -31,26 +31,17 @@ class UserController extends Controller
      * @return object
      */
     public function register(UserRegisterRequest $request) {
-        try {
-//            $newUser = User::firstOrCreate([
-//                'username' => $request->username,
-//                'password' => bcrypt($request->password),
-//                'email' => $request->email,
-//                'id_user_role' => '3',
-//            ]);
-            $newUser = new User();
-            $newUser->username = $request->username;
-            $newUser->password = bcrypt($request->password);
-            $newUser->email = $request->email;
-            $newUser->id_user_role = 3;
-            $newUser->save();
-            $token = $newUser->createToken('normal_user');
-            return response()->json([
-                'token' => $token->accessToken
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json('Intenal Server Error', 500);
-        }
+        $dataUserCreate = [
+            'username' => $request->username,
+            'password' => bcrypt($request->password),
+            'email' => $request->email,
+            'id_user_role' => 3
+        ];
+        $newUser = $this->userModel->createUser($dataUserCreate);
+        $token = $newUser->createToken('normal_user');
+        return response()->json([
+            'token' => $token->accessToken
+        ], 200);
     }
 
     /**
@@ -88,17 +79,38 @@ class UserController extends Controller
      * @return object
      */
     public function getUserDetail($id = null) {
-        try {
-            if (is_null($id)) {
-                $id = Auth::id();
-            }
-            $user = new User($id);
-//            $data = $user->findUser([
-//                'id_user', 'username', 'nickname', 'email', 'avatar_link'
-//            ]);
-            dd($this->userModel->getUserDetail($id));
-        } catch (\Exception $e) {
+        if (is_null($id)) {
+            $id = Auth::id();
+        }
+        $data = $this->userModel->getUserDetail($id, ['username', 'email', 'password']);
+//            dd($data);
+        $customData = collect($data);
 
+        $s = $customData->mapWithKeys(function($item) {
+//            dd($item);
+            return [
+                'user_name' => $item
+            ];
+        });
+
+        dd($s);
+
+        $test = collect([
+            'status' => 'success',
+            'user' => $data
+        ]);
+//        dd($test);
+
+        return response()->json([
+            'data' => $test
+        ], 200);
+    }
+
+    public function putUserDetail(Request $request) {
+        if ($request->hasFile('avatar')) {
+            $request->file('avatar')->store(
+                'avatars/', 'public'
+            );
         }
     }
 }
