@@ -136,3 +136,18 @@ services:
         - 2375
       networks:
         - backend
+
+  ### Minio ################################################
+    minio:
+      container_name: laravel-tech-storage-minio
+      build: ./minio
+      volumes:
+        - ./minio/data:/export
+        - ./minio/config:/root/.minio
+      ports:
+        - "${MINIO_PORT}:9000"
+      environment:
+        - MINIO_ACCESS_KEY=accesskey
+        - MINIO_SECRET_KEY=secretkey
+      networks:
+        - backend

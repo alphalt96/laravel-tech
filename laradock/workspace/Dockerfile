@@ -276,6 +276,9 @@ RUN if [ ${INSTALL_DUSK_DEPS} = true ]; then \
   && rm chromedriver_linux64.zip \
 ;fi
 
+# Install ping for test network
+RUN apt-get install iputils-ping -y
+
 ###########################################################################
 # Phalcon:
 ###########################################################################
