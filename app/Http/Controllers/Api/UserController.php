@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use phpseclib\Crypt\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -109,8 +110,11 @@ class UserController extends Controller
     public function putUserDetail(Request $request) {
         if ($request->hasFile('avatar')) {
             $request->file('avatar')->store(
-                'avatars/', 'public'
+                'avatars/', 'minio'
             );
+//            $fileName = $request->file('avatar')->hashName();
+//            $fileContent = $request->file('avatar');
+//            Storage::cloud()->put('avatars', $fileContent);
         }
     }
 }
